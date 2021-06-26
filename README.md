@@ -1,0 +1,1 @@
+# kyverno-psp-replacement-policy-templates
