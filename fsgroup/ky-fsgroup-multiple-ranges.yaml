@@ -1,0 +1,30 @@
+# maartenvdezz & frankwiersma
+# 23-06-2021
+# Replacement policy for PSP MayRunAs fsGroup validating policy
+
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: privilegedfsgrouprange
+  annotations:
+    policies.kyverno.io/category: Pod Security (additional Maarten Frank)
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: >-
+      Controls the supplemental group applied to some volumes.
+spec:
+  validationFailureAction: enforce
+  background: true
+  rules:
+    - name: fsGroup-dissallow
+      match:
+        resources:
+          kinds:
+            - Pod
+      validate:
+        message: >-
+          fsGroup ranges not allowed.
+        pattern:
+          spec:
+            =(securityContext):
+              =(fsGroup): ">100&<110|>120&<150|>200&<210"

@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pause-host-namespace-hostPID
+  labels:
+    app: pause-host-namespace-hostPID
+spec:
+  containers:
+  - name: pause
+    image: k8s.gcr.io/pause
+  hostPID: true

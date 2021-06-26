@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+    name: pause-selinux
+    labels:
+        app: pause-selinux
+spec:
+  containers:
+  - name: pause
+    image: k8s.gcr.io/pause
+  securityContext:
+    seLinuxOptions:
+      level: "s0:c1,c2"
+      role: sysadm_r
+      type: container_t
+      user: sysadm_u

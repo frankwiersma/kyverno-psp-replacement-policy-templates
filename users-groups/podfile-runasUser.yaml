@@ -1,0 +1,14 @@
+# Maarten
+
+# kubectl create -f- <<EOF                                       
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pause-users
+spec:
+  containers:
+  - name: pause
+    image: k8s.grc.io/pause
+  securityContext:
+    RunAsUser: 1000
+# EOF

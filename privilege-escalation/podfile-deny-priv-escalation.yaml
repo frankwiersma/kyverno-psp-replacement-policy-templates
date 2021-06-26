@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pause-privilege-escalation
+  labels:
+    app: pause-privilege-escalation
+spec:
+  containers:
+  - name: pause
+    image: k8s.gcr.io/pause
+    securityContext:
+      allowPrivilegeEscalation: true
+      

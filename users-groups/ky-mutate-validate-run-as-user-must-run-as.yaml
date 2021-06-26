@@ -1,0 +1,65 @@
+# maartenvdezz & frankwiersma
+# 23-06-2021
+# Add default runAsUser when undefined and validate ranges
+
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: runasusermutatevalidate
+  annotations:
+    policies.kyverno.io/category: Pod Security (additional Maarten Frank)
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: >-
+      Controls the supplemental group applied to some volumes.
+spec:
+  validationFailureAction: enforce
+  background: true
+  rules:
+  - name: runAsUser-mutate-speccontext
+    match:
+      resources:
+        kinds:
+        - Pod
+    mutate:
+      overlay:
+        spec:
+          securityContext:
+            +(runAsUser): 101
+  - name: runAsUser-mutate-containercontext
+    match:
+      resources:
+        kinds:
+        - Pod
+    mutate:
+      overlay:
+        spec:
+          containers:
+          - (name): "*" 
+            +(securityContext):
+              +(runAsUser): 101       
+  - name: runAsUser-validate-speccontext
+    match:
+      resources:
+        kinds:
+        - Pod
+    validate:
+      message: >-
+        Allowed ranges users.
+      pattern:
+        spec:
+          securityContext:
+            runAsUser: ">100&<110|>120&<150|>200&<210"
+  - name: runAsUser-validate-containercontext
+    match:
+      resources:
+        kinds:
+        - Pod
+    validate:
+      message: >-
+        Allowed ranges users.
+      pattern:
+        spec:
+          containers:
+          - securityContext:
+              runAsUser: ">100&<110|>120&<150|>200&<210"

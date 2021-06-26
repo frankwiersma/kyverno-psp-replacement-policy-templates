@@ -1,0 +1,18 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-default-proc-mount
+spec:
+  rules:
+    - name: mutate-default-proc-mount
+      match:
+        resources:
+          kinds:
+            - Pod
+      mutate:
+        overlay:
+          spec:
+            containers:
+            - (name): "*"
+              securityContext:
+                +(readOnlyRootFilesystem): True

@@ -1,0 +1,28 @@
+# maartenvdezz & frankwiersma
+# 24-06-2021
+# Sets Allow Privilege Escalation to boolean(false)
+
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: mutate-deny-privilege-escalation
+  annotations:
+    policies.kyverno.io/category: Pod Security Standards (Restricted)
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: >-
+      Privilege escalation, such as via set-user-ID or set-group-ID file mode, should not be allowed.
+spec:
+  rules:
+  - name: mutate-deny-privilege-escalation
+    match:
+      resources:
+        kinds:
+        - Pod
+    mutate:
+      overlay:
+        spec:
+          containers:
+          - (name): "*" 
+            +(securityContext):
+              +(allowPrivilegeEscalation): false

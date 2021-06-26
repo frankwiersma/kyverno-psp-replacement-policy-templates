@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pause-ro-rootfs
+  labels:
+    app: pause-ro-rootfs
+spec:
+  containers:
+  - name: pause
+    image: k8s.gcr.io/pause
+    securityContext:
+      readOnlyRootFilesystem: false

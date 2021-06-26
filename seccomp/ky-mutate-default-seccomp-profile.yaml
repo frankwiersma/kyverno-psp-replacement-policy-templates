@@ -1,0 +1,29 @@
+# maartenvdezz & frankwiersma
+# 23-06-2021
+# Add default seccomp when undefined and validate profiles
+
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: mutatedefaultseccompprofile
+  annotations:
+    policies.kyverno.io/category: Pod Security (additional Maarten Frank)
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: >-
+      Mutate Default seccomp profiles
+spec:
+  rules:
+  - name: seccomp-mutate-default
+    match:
+      resources:
+        kinds:
+        - Pod
+    mutate:
+      overlay:
+        spec:
+          containers:
+          - (name): "*"
+            securityContext:
+              seccompProfile:
+                +(type): "RuntimeDefault"

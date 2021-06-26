@@ -1,0 +1,12 @@
+# Basic podfile to test working of policies that act on unspecified properties.
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pause-basic-pod
+  labels:
+    app: pause-basic-pod
+spec:
+  containers:
+  - name: pause
+    image: k8s.gcr.io/pause

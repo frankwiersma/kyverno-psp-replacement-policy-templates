@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pause-volume-types-hostPath
+  labels:
+    app: pause-volume-types-hostPath
+spec:
+  containers:
+  - name: pause
+    image: k8s.gcr.io/pause
+    volumeMounts:
+    - mountPath: /tmp
+      name: tmp-vol
+  volumes:
+  - name: tmp-vol
+    hostPath:
+      path: /tmp

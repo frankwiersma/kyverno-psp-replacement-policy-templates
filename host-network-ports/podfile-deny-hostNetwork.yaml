@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pause-host-networking-ports-hostNetwork
+  labels:
+    app: pause-host-networking-ports-hostNetwork
+spec:
+  containers:
+  - name: pause
+    image: k8s.gcr.io/pause
+  hostNetwork: true
+

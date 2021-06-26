@@ -1,0 +1,67 @@
+# maartenvdezz & frankwiersma
+# 24-06-2021
+# selinux validate mutate default
+
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: selinuxmutatevalidate
+  annotations:
+    policies.kyverno.io/category: Pod Security (additional Maarten Frank)
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: >-
+      Controls the options.
+spec:
+  validationFailureAction: enforce
+  background: true  
+  rules:
+    - name: mutatedefaultseLinux
+      match:
+        resources:
+          kinds:
+            - Pod
+      mutate:
+        overlay:
+          spec:
+            securityContext:
+              seLinuxOptions:
+                +(level): "s0:c1,c2"
+                +(role): sysadm_r
+                +(type): container_t
+                +(user): sysadm_u
+    - name: validateseLinux
+      match:
+        resources:
+          kinds:
+          - Pod
+      validate:
+        message: >-
+          podspec
+        pattern:
+          spec:
+            securityContext:
+              seLinuxOptions:
+                level: "s0:c1,c2"
+                role: sysadm_r
+                type: container_t
+                user: sysadm_u
+    - name: validateseLinuxcontainers
+      match:
+        resources:
+          kinds:
+          - Pod
+      validate:
+        message: >-
+          container
+        pattern:
+          spec:
+            containers:
+              - =(securityContext):
+                  =(seLinuxOptions):
+                    =(level): "s0:c1,c2"
+                    =(role): sysadm_r
+                    =(type): container_t
+                    =(user): sysadm_u
+
+# ALLOW MULTIPLE SELinux OPTIONS (anypattern?)

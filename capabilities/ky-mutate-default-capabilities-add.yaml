@@ -1,0 +1,20 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-default-capabilities
+spec:
+  rules:
+    - name: mutate-default-proc-mount
+      match:
+        resources:
+          kinds:
+            - Pod
+      mutate:
+        overlay:
+          spec:
+            containers:
+            - (name): "*"
+              securityContext:
+                capabilities:
+                  add:
+                  - CAP_NET_RAW

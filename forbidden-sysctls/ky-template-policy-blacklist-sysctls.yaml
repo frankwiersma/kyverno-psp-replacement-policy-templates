@@ -1,0 +1,35 @@
+# maartenvdezz & frankwiersma
+# 23-06-2021
+# Mimics blacklisting sysctls capability of Kubernetes Pod Security Policies
+
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: blacklist-sysctls
+  annotations:
+    policies.kyverno.io/category: Pod Security Standards (Baseline)
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: >-
+      Sysctls can disable security mechanisms or affect all containers on a
+      host, and should be disallowed except for an allowed "safe" subset. A
+      sysctl is considered safe if it is namespaced in the container or the
+      Pod, and it is isolated from other Pods or processes on the same Node.
+spec:
+  validationFailureAction: enforce
+  background: true
+  rules:
+  - name: blacklistsysctls
+    match:
+      resources:
+        kinds:
+        - Pod
+    validate:
+      message: >-
+        Blacklisted sysctls.
+      pattern:
+        spec:
+          =(securityContext):
+            ^(sysctls):
+            - =(name): "!kernel.*"
+            - =(name): "!net.ipv4.tcp_syncookies"

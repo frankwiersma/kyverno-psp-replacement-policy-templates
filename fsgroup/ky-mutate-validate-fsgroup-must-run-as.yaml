@@ -1,0 +1,40 @@
+# maartenvdezz & frankwiersma
+# 23-06-2021
+# Add default fsgroup when undefined and validate ranges
+
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: privilegedfsgrouprange
+  annotations:
+    policies.kyverno.io/category: Pod Security (additional Maarten Frank)
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: >-
+      Controls the supplemental group applied to some volumes.
+spec:
+  validationFailureAction: enforce
+  background: true
+  rules:
+  - name: fsGroup-mutate
+    match:
+      resources:
+        kinds:
+        - Pod
+    mutate:
+      overlay:
+        spec:
+          securityContext:
+            +(fsGroup): 101
+  - name: fsGroup-allow
+    match:
+      resources:
+        kinds:
+        - Pod
+    validate:
+      message: >-
+        fsGroup ranges allowed.
+      pattern:
+        spec:
+          securityContext:
+            fsGroup: ">100&<110|>120&<150|>200&<210"

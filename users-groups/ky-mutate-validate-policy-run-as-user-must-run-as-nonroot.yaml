@@ -1,0 +1,78 @@
+# maartenvdezz & frankwiersma
+# 23-06-2021
+# Requires that the pod be submitted with a non-zero runAsUser 
+# or have the USER directive defined (using a numeric UID) in the image.
+# Pods which have specified neither runAsNonRoot nor runAsUser settings will be mutated to set runAsNonRoot=true, 
+# thus requiring a defined non-zero numeric USER directive in the container. No default provided.
+
+# Template based on https://github.com/kyverno/policies/blob/main/pod-security/restricted/require-run-as-nonroot/require-run-as-nonroot.yaml
+
+# Still no working condition in the case that no runAsUser was specified.
+
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-run-as-non-root
+  annotations:
+    policies.kyverno.io/category: Pod Security Standards (Restricted)
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: Containers must be required to run as non-root users.
+spec:
+  background: true
+  validationFailureAction: enforce
+  rules:
+  - name: mutate-run-as-non-root-spec-context
+    match:
+      resources:
+        kinds:
+        - Pod
+    mutate:
+      overlay:
+        spec:
+          containers:
+          - (name): "*" 
+            securityContext:
+              (runAsNonRoot): null 
+          securityContext:
+            (runAsNonRoot): null
+            +(runAsNonRoot): true
+  - name: mutate-run-as-non-root-container-context
+    match:
+      resources:
+        kinds:
+        - Pod
+    mutate:
+      overlay:  
+        spec:
+          containers:
+          - (name): "*" 
+            securityContext:
+              +(runAsNonRoot): true       
+  - name: runAsNonRoot-validate-container-and-spec-context
+    match:
+      resources:
+        kinds:
+        - Pod
+    validate:
+      message: >-
+        Running as root is not allowed. The fields spec.securityContext.runAsNonRoot,
+        spec.containers[*].securityContext.runAsNonRoot, and
+        spec.initContainers[*].securityContext.runAsNonRoot must be `true`.        
+      anyPattern:
+      - spec:
+          securityContext:
+            runAsNonRoot: true
+          containers:
+          - =(securityContext):
+              =(runAsNonRoot): true
+          =(initContainers):
+          - =(securityContext):
+              =(runAsNonRoot): true              
+      - spec:
+          containers:
+          - securityContext:
+              runAsNonRoot: true
+          =(initContainers):
+          - securityContext:
+              runAsNonRoot: true         

@@ -1,0 +1,65 @@
+# maartenvdezz & frankwiersma
+# 23-06-2021
+# Add default runAsGroup when undefined and validate ranges
+
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: runasgroupmutatevalidate
+  annotations:
+    policies.kyverno.io/category: Pod Security (additional Maarten Frank)
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: >-
+      Controls the supplemental group applied to some volumes.
+spec:
+  validationFailureAction: enforce
+  background: true
+  rules:
+  - name: runAsGroup-mutate-speccontext
+    match:
+      resources:
+        kinds:
+        - Pod
+    mutate:
+      overlay:
+        spec:
+          securityContext:
+            +(runAsGroup): 101
+  - name: runAsGroup-mutate-containercontext
+    match:
+      resources:
+        kinds:
+        - Pod
+    mutate:
+      overlay:
+        spec:
+          containers:
+          - (name): "*" 
+            +(securityContext):
+              +(runAsGroup): 101       
+  - name: runAsGroup-validate-speccontext
+    match:
+      resources:
+        kinds:
+        - Pod
+    validate:
+      message: >-
+        Allowed ranges groups.
+      pattern:
+        spec:
+          securityContext:
+            runAsGroup: ">100&<110|>120&<150|>200&<210"
+  - name: runAsGroup-validate-containercontext
+    match:
+      resources:
+        kinds:
+        - Pod
+    validate:
+      message: >-
+        Allowed ranges groups.
+      pattern:
+        spec:
+          containers:
+          - securityContext:
+              runAsGroup: ">100&<110|>120&<150|>200&<210"

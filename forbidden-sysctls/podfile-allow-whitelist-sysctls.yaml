@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pause-allowed-sysctls
+  labels:
+    app: pause-allowed-sysctls
+spec:
+  containers:
+  - name: pause
+    image: k8s.gcr.io/pause
+  securityContext:
+    sysctls:
+    - name: kernel.msgmax
+      value: "200"

@@ -1,0 +1,35 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: mutate-drop-all-capabilities
+spec:
+  validationFailureAction: enforce
+  rules:
+    - name: drop-all-capabilities-but
+      match:
+        resources:
+          kinds:
+            - Pod
+      mutate:
+        overlay:
+          spec:
+            containers:
+            - (name): "*"
+              securityContext:
+                capabilities:
+                  drop:
+                  - CAP_NET_RAW
+    - name: validate-default
+      match:
+        resources:
+          kinds:
+          - Pod
+      validate:
+        message: "All capabilities should be dropped with only those required added back."
+        pattern:
+          spec:
+            containers:
+              - =(securityContext):
+                  =(capabilities):
+                    =(add):
+                    - "!CAP_NET_RAW"

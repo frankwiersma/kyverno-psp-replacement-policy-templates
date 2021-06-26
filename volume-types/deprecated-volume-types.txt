@@ -1,0 +1,3 @@
+flocker
+gitRepo
+scaleIO

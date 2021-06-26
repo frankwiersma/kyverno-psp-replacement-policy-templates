@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pause-fsgroup-disallowed
+spec:
+  containers:
+  - name: pause
+    image: k8s.gcr.io/pause
+    volumeMounts:
+    - name: tmp-vol
+      mountPath: /tmp
+  securityContext:
+    fsGroup: 65536
+  volumes:
+  - name: tmp-vol
+    emptyDir: {}

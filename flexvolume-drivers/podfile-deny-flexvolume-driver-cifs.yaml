@@ -1,0 +1,19 @@
+# Example pod that should be blocked
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pause-flexvolume-drivers-cifs
+  labels:
+    app: pause-flexvolume-drivers-cifs
+spec:
+  containers:
+  - name: pause
+    image: k8s.gcr.io/pause
+    volumeMounts:
+    - mountPath: /tmp
+      name: tmp-vol
+  volumes:
+  - name: tmp-vol
+    flexVolume:
+      driver: example/bad
