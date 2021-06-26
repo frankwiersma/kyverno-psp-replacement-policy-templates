@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pause-apparmor
+  labels:
+    app: pause-apparmor
+  annotations:
+    container.apparmor.security.beta.kubernetes.io/pause: unconfined
+spec:
+  containers:
+  - name: pause
+    image: k8s.gcr.io/pause

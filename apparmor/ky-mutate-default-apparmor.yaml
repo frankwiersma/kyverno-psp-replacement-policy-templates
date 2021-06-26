@@ -1,0 +1,27 @@
+# maartenvdezz & frankwiersma
+# 23-06-2021
+# Add default apparmor when undefined and validate profiles
+# Seems that filling in the specific container name during mutation is not possible.
+
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: armormutatevalidate
+  annotations:
+    policies.kyverno.io/category: Pod Security (additional Maarten Frank)
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: >-
+      Validate and Mutate Apparmor profiles
+spec:
+  rules:
+  - name: apparmor-mutate-default
+    match:
+      resources:
+        kinds:
+        - Pod
+    mutate:
+      overlay:
+        metadata:
+          annotations:
+            +(container.apparmor.security.beta.kubernetes.io/pause): "runtime/default"
