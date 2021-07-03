@@ -16,5 +16,7 @@ spec:
             - (name): "*"
               securityContext:
                 capabilities:
+                  (drop):
+                  - "!CAP_NET_RAW"
                   add:
-                  - CAP_NET_RAW
+                  - "CAP_NET_RAW"
